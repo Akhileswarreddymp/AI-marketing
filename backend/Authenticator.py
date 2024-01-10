@@ -22,7 +22,7 @@ async def user_register(data :register_params ):
         return {
             "msg":"user already exist"
         }
-    await send_otp(redis_client.get(f"{data.email}_mail").decode())
+    await send_otp(redis_client.get(f"{data.email}_email").decode())
     redis_client.close()
     return {
             "msg":"Details stored in redis"
@@ -66,7 +66,6 @@ async def redis_store(otp,email):
     redis_client.close()
 
 
-\
 
 @router.post('/verify_otp',tags=['Authentication'])
 async def verifyOtp(request : only_otp):
