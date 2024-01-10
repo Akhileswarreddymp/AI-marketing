@@ -54,11 +54,8 @@ async def authMiddleware(request: fastapi.Request, call_next):
     print(request.method)
     response = fastapi.Response(None, status_code=403)
     allowed_paths = [
-        '/api/login',
         '/api/users/verify_otp',
         '/api/users/register',
-        '/api/payment/create_payment',
-        '/api/payment/verify_payment',
         '/api/users/send_otp',
         "/docs",
         "/openapi.json",
