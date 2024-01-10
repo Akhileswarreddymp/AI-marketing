@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pypi-json
+uvicorn[standard]
+pymongo
+aioredis
+motor
