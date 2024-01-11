@@ -95,8 +95,8 @@ async def verifyOtp(request : only_otp):
 async def check_user(data):
     password = hashlib.md5(data.password.encode('utf-8')).hexdigest()
     collection = await dbconnect('user_auth','users')
-    result = collection.find_one({"email": data.username})
-    if result.get("email") == data.username and result.get("password") == password:
+    result = collection.find_one({"email": data.email})
+    if result.get("email") == data.email and result.get("password") == password:
         return True
     else:
         return False
@@ -107,10 +107,10 @@ async def check_user(data):
 @router.post('/login',tags=['Authentication'])
 async def Userlogin(data : login_params):
     cookie_name = "Akhil"
-    if check_user(data):
+    if await check_user(data):
         cookie_id = str(uuid.uuid4())
         print("cookie_id",cookie_id)
-        access_token =  signJWT(data.username)
+        access_token =  signJWT(data.email)
         redis_client = await redisConnection()
         store_cookie_id = redis_client.hset("CookieStore", cookie_id, "useraccesstoken." + access_token["access_token"])
         response = responses.JSONResponse({"status": "Logged in Successfully","token" : access_token}, status_code=200)
@@ -118,6 +118,8 @@ async def Userlogin(data : login_params):
         return response
     else:
         raise HTTPException(status_code=401, detail="Wrong Credentials received")
+
+
 
 @router.post('/forgot-password',tags=['Authentication'])
 async def forgotPassword(data : forgotPassword_params):
@@ -135,3 +137,25 @@ async def forgotPassword(data : forgotPassword_params):
             raise HTTPException(status_code=401, detail="New Password and re entred password are not matched")
     else:
         raise HTTPException(status_code=401, detail="Incorrect OTP")
+    
+
+
+@router.post('/reset-password',tags=['Authentication'])
+async def resetPassword(data : resetPassword_params):
+    collection = await dbconnect('user_auth','users')
+    result = collection.find_one({"email": data.email})
+    oldPassword = result.get("password")
+    print("filter====>",oldPassword)
+    user_entred_password = hashlib.md5(data.old_password.encode('utf-8')).hexdigest()
+    if oldPassword == user_entred_password:
+        filter = {"_id":result.get("_id")}
+        if data.new_password == data.confirm_password:
+            new_pass = hashlib.md5(data.new_password.encode('utf-8')).hexdigest()
+            update_field = collection.update_one(filter,{'$set': {"password":new_pass}})
+            return {"msg": "Password Updated Successfully"}
+        else:
+            raise HTTPException(status_code=401, detail="New Password and re entred password are not matched")
+    else:
+        raise HTTPException(status_code=401, detail="Received incorrect password")
+    
+    

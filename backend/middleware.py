@@ -60,7 +60,8 @@ async def authMiddleware(request: fastapi.Request, call_next):
         "/docs",
         "/openapi.json",
         "/api/users/login",
-        "/api/users/forgot-password"
+        "/api/users/forgot-password",
+        "/api/users/reset-password"
     ]
     if request.method == "OPTIONS":
         return await call_next(request)

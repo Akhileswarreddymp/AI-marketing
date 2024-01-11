@@ -18,7 +18,7 @@ class only_otp(pydantic.BaseModel):
 
 
 class login_params(pydantic.BaseModel):
-    username : str
+    email : str
     password : str
 
 
@@ -27,3 +27,11 @@ class forgotPassword_params(pydantic.BaseModel):
     otp : str
     newpassword : str
     confirm_Password : str
+
+
+class resetPassword_params(pydantic.BaseModel):
+    email : str
+    old_password : str
+    new_password : str
+    confirm_password : str
+
