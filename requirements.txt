@@ -5,3 +5,5 @@ uvicorn[standard]
 pymongo
 aioredis
 motor
+jwt
+python-decouple
