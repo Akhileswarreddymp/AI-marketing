@@ -1,10 +1,12 @@
-from fastapi import FastAPI,APIRouter,HTTPException
+from fastapi import APIRouter,HTTPException,responses
 from models import *
 from mongo import *
 import hashlib
 import random
 import smtplib
 from email.message import EmailMessage
+import uuid
+from jwt_auth import *
 
 router = APIRouter(prefix='/users')
 
@@ -90,7 +92,29 @@ async def verifyOtp(request : only_otp):
         print("user created successfully")
         return {"msg" : "user created successfully"}
 
+async def check_user(data):
+    password = hashlib.md5(data.password.encode('utf-8')).hexdigest()
+    collection = await dbconnect('user_auth','users')
+    result = collection.find_one({"email": data.username})
+    if result.get("email") == data.username and result.get("password") == password:
+        return True
+    else:
+        return False
 
 
 
 
+@router.post('/login',tags=['Authentication'])
+async def Userlogin(data : login_params):
+    cookie_name = "Akhil"
+    if check_user(data):
+        cookie_id = str(uuid.uuid4())
+        print("cookie_id",cookie_id)
+        access_token =  signJWT(data.username)
+        redis_client = await redisConnection()
+        store_cookie_id = redis_client.hset("CookieStore", cookie_id, "useraccesstoken." + access_token["access_token"])
+        response = responses.JSONResponse({"status": "Logged in Successfully","token" : access_token}, status_code=200)
+        response.set_cookie(cookie_name,cookie_id, path="/", expires=3600, samesite="Lax", secure=True)
+        return response
+    else:
+        raise HTTPException(status_code=401, detail="Wrong Credentials received")

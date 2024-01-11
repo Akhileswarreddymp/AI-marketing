@@ -59,7 +59,7 @@ async def authMiddleware(request: fastapi.Request, call_next):
         '/api/users/send_otp',
         "/docs",
         "/openapi.json",
-        
+        "/api/users/login"
     ]
     if request.method == "OPTIONS":
         return await call_next(request)

@@ -15,4 +15,8 @@ class otp_email(pydantic.BaseModel):
 class only_otp(pydantic.BaseModel):
     otp : str
     email : str
-    
+
+
+class login_params(pydantic.BaseModel):
+    username : str
+    password : str
