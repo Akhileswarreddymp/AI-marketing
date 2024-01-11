@@ -87,9 +87,9 @@ async def verifyOtp(request : only_otp):
         }
         add_user = collection.insert_one(user_data)
         print("add_user===>",add_user)
-        print("user_data=====>",user_data)
         print("user created successfully")
         return {"msg" : "user created successfully"}
+
 
 
 
