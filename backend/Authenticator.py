@@ -32,7 +32,7 @@ async def user_register(data :register_params ):
 
 
 
-@router.post("/send_otp", tags=["Authentication"])
+@router.post("/send_otp", tags=["OTP"])
 async def send_otp(request: otp_email):
     if not isinstance(request,str):
         d = dict(request)
@@ -69,7 +69,7 @@ async def redis_store(otp,email):
 
 
 
-@router.post('/verify_otp',tags=['Authentication'])
+@router.post('/verify_otp',tags=['OTP'])
 async def verifyOtp(request : only_otp):
     data = request
     print("otpdata===>",data.otp)
@@ -90,13 +90,14 @@ async def verifyOtp(request : only_otp):
         add_user = collection.insert_one(user_data)
         print("add_user===>",add_user)
         print("user created successfully")
+        redis_client.close()
         return {"msg" : "user created successfully"}
 
 async def check_user(data):
     password = hashlib.md5(data.password.encode('utf-8')).hexdigest()
     collection = await dbconnect('user_auth','users')
     result = collection.find_one({"email": data.email})
-    if result.get("email") == data.email and result.get("password") == password:
+    if result and result.get("email") == data.email and result.get("password") == password:
         return True
     else:
         return False
@@ -115,6 +116,7 @@ async def Userlogin(data : login_params):
         store_cookie_id = redis_client.hset("CookieStore", cookie_id, "useraccesstoken." + access_token["access_token"])
         response = responses.JSONResponse({"status": "Logged in Successfully","token" : access_token}, status_code=200)
         response.set_cookie(cookie_name,cookie_id, path="/", expires=3600, samesite="Lax", secure=True)
+        redis_client.close()
         return response
     else:
         raise HTTPException(status_code=401, detail="Wrong Credentials received")
@@ -132,10 +134,14 @@ async def forgotPassword(data : forgotPassword_params):
             filter = {"_id":result.get("_id")}
             new_password = hashlib.md5(data.newpassword.encode('utf-8')).hexdigest()
             update_field = collection.update_one(filter,{'$set': {"password":new_password}})
+            redis_client.close()
             return {"msg": "Password Updated Successfully"}
         else:
+            redis_client.close()
             raise HTTPException(status_code=401, detail="New Password and re entred password are not matched")
+        redis_client.close()
     else:
+        redis_client.close()
         raise HTTPException(status_code=401, detail="Incorrect OTP")
     
 
