@@ -118,3 +118,20 @@ async def Userlogin(data : login_params):
         return response
     else:
         raise HTTPException(status_code=401, detail="Wrong Credentials received")
+
+@router.post('/forgot-password',tags=['Authentication'])
+async def forgotPassword(data : forgotPassword_params):
+    redis_client = await redisConnection()
+    print(redis_client.get(f"{data.email}_otp"),data.otp)
+    if redis_client.get(f"{data.email}_otp").decode() == data.otp:
+        if data.newpassword == data.confirm_Password:
+            collection = await dbconnect('user_auth','users')
+            result = collection.find_one({"email": data.email})
+            filter = {"_id":result.get("_id")}
+            new_password = hashlib.md5(data.newpassword.encode('utf-8')).hexdigest()
+            update_field = collection.update_one(filter,{'$set': {"password":new_password}})
+            return {"msg": "Password Updated Successfully"}
+        else:
+            raise HTTPException(status_code=401, detail="New Password and re entred password are not matched")
+    else:
+        raise HTTPException(status_code=401, detail="Incorrect OTP")
