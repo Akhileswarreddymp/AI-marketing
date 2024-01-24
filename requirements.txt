@@ -7,3 +7,4 @@ aioredis
 motor
 jwt
 python-decouple
+dash
