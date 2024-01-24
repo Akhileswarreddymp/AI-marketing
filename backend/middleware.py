@@ -34,6 +34,7 @@ origins = [
     "http://localhost",
     "http://localhost:8001",
     "http://127.0.0.1:8001",
+    "http://127.0.0.1:5500",
 ]
 
 
@@ -61,13 +62,20 @@ async def authMiddleware(request: fastapi.Request, call_next):
         "/openapi.json",
         "/api/users/login",
         "/api/users/forgot-password",
-        "/api/users/reset-password"
+        "/api/users/reset-password",
+        "/api/iex/market-data/",
+        "/api/alphavantage/market-data/", 
     ]
+
     if request.method == "OPTIONS":
         return await call_next(request)
     if request.url.path in allowed_paths:
         return await call_next(request)
-    
+    requested_path = request.url.path
+    if any(requested_path.startswith(path.rstrip('/')) for path in allowed_paths):
+        return await call_next(request)
+
+
     cookie_value = request.cookies.get(cookie_name)
     print("request_headers=",request.headers)
     print(f"Cookie Name: {cookie_name}")
