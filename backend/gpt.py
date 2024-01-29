@@ -22,4 +22,4 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
 # Example usage
 prompt = "give me code for adding 2 numbers"
 input_text = "Hello, how are you?"
-get_completion(prompt)
+# get_completion(prompt)

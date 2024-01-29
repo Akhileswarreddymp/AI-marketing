@@ -8,3 +8,4 @@ motor
 jwt
 python-decouple
 dash
+python-multipart

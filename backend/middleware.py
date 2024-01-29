@@ -65,6 +65,7 @@ async def authMiddleware(request: fastapi.Request, call_next):
         "/api/users/reset-password",
         "/api/iex/market-data/",
         "/api/alphavantage/market-data/", 
+        "/api/upload_file",
     ]
 
     if request.method == "OPTIONS":
