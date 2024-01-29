@@ -1,7 +1,9 @@
 import os
-from fastapi import APIRouter,UploadFile
+from fastapi import APIRouter,UploadFile,HTTPException
 from typing import List
 import shutil
+from fastapi.responses import FileResponse
+
 
 router = APIRouter()
 
@@ -36,3 +38,17 @@ async def upload_files(request: List[UploadFile] = None):
             print("File saved successfully")
         except Exception as e:
             print("Exception raised: ", e)
+
+
+
+@router.get('/get_file/{filename}', tags=['Sample_pic'])
+async def get_file(filename: str):
+    file_backup_path = os.path.join("./file_backup", filename)
+    backupfiles_path = os.path.join("./backupfiles", filename)
+
+    if os.path.exists(file_backup_path):
+        return FileResponse(file_backup_path, filename=filename)
+    elif os.path.exists(backupfiles_path):
+        return FileResponse(backupfiles_path, filename=filename)
+    else:
+        raise HTTPException(status_code=404, detail="File not found")
