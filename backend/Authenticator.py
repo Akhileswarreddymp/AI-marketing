@@ -46,10 +46,9 @@ async def send_otp(request: otp_email):
 
     message = EmailMessage()
     message["Subject"] = "Verificaion code to change password"
-    #sending otp text in this format
     message = f"Your verification cod is {otp_generated}"
     s.subject = "Verification code"
-    # send mail
+
     s.sendmail("akhileswarreddymp@gmail.com",request, message)
     print("akhileswarreddymp@gmail.com", request, message)
     print("Mail sent sucessfully")
