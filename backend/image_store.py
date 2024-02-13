@@ -12,7 +12,7 @@ async def upload_files(request: List[UploadFile] = None):
     file_backup_path = "./file_backup"
     # backupfiles_path = "./backupfiles"
 
-    # Create the backupfiles directory if it doesn't exist
+
     os.makedirs(file_backup_path, exist_ok=True)
     # os.makedirs(backupfiles_path, exist_ok=True)
 
@@ -28,7 +28,7 @@ async def upload_files(request: List[UploadFile] = None):
     #         file_path = os.path.join(file_backup_path, filename)
     #         os.remove(file_path)
     #     print("Files removed from file_backup folder")
-    # Save new files in file_backup
+
     for data1 in request:
         filename = data1.filename
         file_path = os.path.join(file_backup_path, filename)
