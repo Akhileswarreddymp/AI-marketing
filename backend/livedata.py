@@ -3,15 +3,13 @@ import requests
 
 router = APIRouter()
 
-# Replace with your IEX Cloud API key
+# IEX Cloud API key
 IEX_API_KEY = "pk_0b3ef1c9be9f45b598b4788633f31be2"
 
-# Replace with your Alpha Vantage API key
+# Alpha Vantage API key
 ALPHA_VANTAGE_API_KEY = "UX1HBCHIZB4E8NCS"
 
-# @router.get("/")
-# def read_root():
-#     return {"message": "Welcome to the Indian Market Data API"}
+
 
 @router.get("/iex/market-data/{symbol}")
 def get_iex_data(symbol: str):
