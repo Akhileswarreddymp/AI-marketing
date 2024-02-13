@@ -35,3 +35,10 @@ class resetPassword_params(pydantic.BaseModel):
     new_password : str
     confirm_password : str
 
+
+class tickets(pydantic.BaseModel):
+    title : str
+    description : str
+    priority : str
+    number : int 
+    
