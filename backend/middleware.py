@@ -67,7 +67,11 @@ async def authMiddleware(request: fastapi.Request, call_next):
         "/api/alphavantage/market-data/", 
         "/api/upload_file",
         "/api/get_file/",
-        "/api/raise_ticket"
+        "/api/raise_ticket",
+        "/api/userCreate",
+        "/api/get_user",
+        "/api/delete_user",
+        "/api/update_user"
     ]
 
     if request.method == "OPTIONS":

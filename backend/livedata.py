@@ -11,14 +11,14 @@ ALPHA_VANTAGE_API_KEY = "UX1HBCHIZB4E8NCS"
 
 
 
-@router.get("/iex/market-data/{symbol}")
+@router.get("/iex/market-data/{symbol}",tags=["Stock Market Data"])
 def get_iex_data(symbol: str):
     url = f"https://cloud.iexapis.com/stable/stock/{symbol}/quote?token={IEX_API_KEY}"
     response = requests.get(url)
     print(response.json())
     return response.json()
 
-@router.get("/alphavantage/market-data/{symbol}")
+@router.get("/alphavantage/market-data/{symbol}",tags=["Stock Market Data"])
 def get_alpha_vantage_data(symbol: str):
     url = f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=1min&apikey={ALPHA_VANTAGE_API_KEY}"
     response = requests.get(url)
