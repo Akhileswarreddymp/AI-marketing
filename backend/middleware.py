@@ -5,8 +5,16 @@ import os
 import importlib
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Union
+from fastapi.responses import JSONResponse
+import jwt
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+from decouple import config
 
 app = fastapi.FastAPI()
+
+
+JWT_SECRET = config("JWT_SECRET")
+JWT_ALGORITHM = config("JWT_ALGORITHM")
 
 app.on_event("startup")
 def onstart():
@@ -50,9 +58,6 @@ cookie_name = "Akhil"
 
 @app.middleware('http')
 async def authMiddleware(request: fastapi.Request, call_next):
-    payload_data = request.json()
-    print("payload_data====>",payload_data)
-    print(request.method)
     response = fastapi.Response(None, status_code=403)
     allowed_paths = [
         '/api/users/verify_otp',
@@ -61,38 +66,25 @@ async def authMiddleware(request: fastapi.Request, call_next):
         "/docs",
         "/openapi.json",
         "/api/users/login",
-        "/api/users/forgot-password",
-        "/api/users/reset-password",
-        "/api/iex/market-data/",
-        "/api/alphavantage/market-data/", 
-        "/api/upload_file",
-        "/api/get_file/",
-        "/api/raise_ticket",
-        "/api/userCreate",
-        "/api/get_user",
-        "/api/delete_user",
-        "/api/update_user"
     ]
 
     if request.method == "OPTIONS":
         return await call_next(request)
-    if request.url.path in allowed_paths:
-        return await call_next(request)
     requested_path = request.url.path
-    if any(requested_path.startswith(path.rstrip('/')) for path in allowed_paths):
+    if requested_path in allowed_paths:
+        return await call_next(request)
+    elif any(requested_path.startswith(path.rstrip('/')) for path in allowed_paths):
         return await call_next(request)
 
+    authorization: str = request.headers.get('access_token')
+    if not authorization or not authorization.startswith("Bearer "):
+        return JSONResponse({"detail": "Not authenticated"}, status_code=401)
+    token = authorization.replace("Bearer ", "")
+    try:
+        decoded_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        request.state.user = decoded_token.get("userId")
+        return await call_next(request)
+    except InvalidTokenError:
+        return JSONResponse({"detail": "Invalid token"}, status_code=401)
 
-    cookie_value = request.cookies.get(cookie_name)
-    print("request_headers=",request.headers)
-    print(f"Cookie Name: {cookie_name}")
-    print(f"Cookie Value: {cookie_value}")
-
-    # if not cookie_value:
-    #     redirect_url = f"https://{request.base_url.hostname}/login"
-    #     print("redirect_url",redirect_url)
-    #     # response: fastapi.responses.Response = await call_next(request)
-    #     response = fastapi.responses.JSONResponse({'url': redirect_url}, status_code=401)
-
-    return response
 
