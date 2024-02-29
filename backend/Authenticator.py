@@ -110,11 +110,11 @@ async def Userlogin(data : login_params):
     if await check_user(data):
         cookie_id = str(uuid.uuid4())
         access_token =  signJWT(data.email)
-        # redis_client = await redisConnection()
-        # store_cookie_id = redis_client.hset("CookieStore", cookie_id, "useraccesstoken." + access_token["access_token"])
+        redis_client = await redisConnection()
+        store_cookie_id = redis_client.hset("CookieStore", cookie_id, "useraccesstoken." + access_token["access_token"])
         response = responses.JSONResponse({"status": "Logged in Successfully","access_token" : access_token}, status_code=200)
         response.set_cookie(cookie_name,cookie_id, path="/", expires=3600, samesite="Lax", secure=True)
-        # redis_client.close()
+        redis_client.close()
         return response
     else:
         raise HTTPException(status_code=401, detail="Wrong Credentials received")
