@@ -2,6 +2,7 @@ from fastapi import APIRouter,Request,HTTPException
 from models import *
 from mongo import *
 from jwt_auth import decodeJWT
+from bson.objectid import ObjectId
 
 router = APIRouter()
 
@@ -29,3 +30,24 @@ async def create_ticket(request : tickets,auth:Request):
     }
     create_ticket = collection.insert_one(ticket_data)
     return {"msg" : "Ticket Raised Successfully"}
+
+
+@router.get("/get_tickets",tags=["Tickets"])
+async def get_tickets():
+    collection = await dbconnect('Tickets','ticket')
+    get_ticket = collection.find()
+    user_data = []
+    for doc in get_ticket:
+        doc['_id'] = str(doc['_id'])
+        user_data.append(doc)
+    return user_data
+
+
+@router.delete("/deleteNote",tags=["Tickets"])
+async def deleteNotes(request : deleteTicket):
+    query1= {'_id': ObjectId(request.id)}
+    collection = await dbconnect('Tickets','ticket')
+    
+    delete_user = collection.delete_one(query1)
+    print(delete_user)
+    return {"msg":"Note Deleted"}

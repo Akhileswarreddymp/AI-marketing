@@ -41,4 +41,8 @@ class tickets(pydantic.BaseModel):
     description : str
     priority : str
     number : int 
+
+
+class deleteTicket(pydantic.BaseModel):
+    id : str
     
