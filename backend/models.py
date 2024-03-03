@@ -45,4 +45,10 @@ class tickets(pydantic.BaseModel):
 
 class deleteTicket(pydantic.BaseModel):
     id : str
+
+class updateTicket(pydantic.BaseModel):
+    id:str
+    title : str
+    description : str
+    priority : str
     
