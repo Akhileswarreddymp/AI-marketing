@@ -93,6 +93,24 @@ async def update_user(request : update_userP):
     output = await get_user_data()
     return output
 
+class Leads(pydantic.BaseModel):
+    phone_work : int
+    first_name : str
+    last_name : str
+
+
+@router.post("/create_leads",tags=["Leads"])
+async def createLead(request : Leads):
+    if not isinstance(request,dict):
+        data = dict(request)
+    else:
+        data = request
+    collection = await dbconnect('Leads','lead')
+    create_Lead = collection.insert_one(data)
+    return {"msg" : "Lead Created Successfully"}
+    
+
+
 
 
 

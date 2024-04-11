@@ -54,10 +54,12 @@ async def get_tickets(auth:Request):
 async def deleteTicket(request : deleteTicket):
     query1= {'_id': ObjectId(request.id)}
     collection = await dbconnect('Tickets','ticket')
-    
-    delete_user = collection.delete_one(query1)
-    print(delete_user)
-    return {"msg":"Note Deleted"}
+    get_ticket = collection.find(query1)
+    if get_ticket:
+        delete_ticket = collection.delete_one(query1)
+        return {"msg":"Ticket Deleted"}
+    else:
+        return {"msg" : "Ticket Not Found"}
 
 @router.put("/updateTicket",tags=["Tickets"])
 async def updateTicket(request : updateTicket):
@@ -73,7 +75,11 @@ async def updateTicket(request : updateTicket):
             "ph_number" : data.get("number")
         }
     }
-    query1= {'_id': ObjectId(request.id)}
     collection = await dbconnect('Tickets','ticket')
-    delete_user = collection.update_one(query1,update_document)
-    return {"msg":"Ticket Updated"}
+    query1= {'_id': ObjectId(request.id)}
+    get_ticket = collection.find(query1)
+    if get_ticket:     
+        update_ticket = collection.update_one(query1,update_document)
+        return {"msg":"Ticket Updated"}
+    else:
+        return {"msg" : "Ticket Not Found"}
